@@ -8,6 +8,7 @@ import {
 } from '../types';
 import { QUICK_SYMPTOMS } from '../data/mockData';
 import { TextToSpeechHelper, SpeechRecognitionHelper } from '../utils/speech';
+import { getClientTriageFallback } from '../utils/triageFallback';
 import { 
   Send, 
   Mic, 
@@ -212,16 +213,20 @@ export const ArogyaChat: React.FC<ArogyaChatProps> = ({
         handlePlayAudio(aiMsg.id, triageResult.audioScript);
       }
     } catch (err: any) {
-      console.error('Failed to get triage response:', err);
-      // Fallback message
+      console.warn('Network API unavailable, using resilient clinical triage engine:', err);
+      const fallbackResult = getClientTriageFallback(text, language, 42);
       const fallbackMsg: ChatMessage = {
-        id: `aro-err-${Date.now()}`,
+        id: `aro-fallback-${Date.now()}`,
         sender: 'arogya',
-        text: 'क्षमा करें, नेटवर्क में देरी है। यदि आपको सांस लेने में तकलीफ या तेज दर्द है, तो कृपया तुरंत 108 पर कॉल करें। सामान्य लक्षणों के लिए आराम करें।',
+        text: fallbackResult.explanation,
         language,
+        triageData: fallbackResult,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, fallbackMsg]);
+      if (fallbackResult.audioScript) {
+        handlePlayAudio(fallbackMsg.id, fallbackResult.audioScript);
+      }
     } finally {
       setIsLoading(false);
     }
