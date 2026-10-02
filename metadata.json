@@ -1,0 +1,6 @@
+{
+  "name": "Swasthya Setu - Rural Telehealth Bridge",
+  "description": "Accessible rural telehealth platform with multilingual AI triage, low-bandwidth consultations, real-time Jan Aushadhi pharmacy stock, and offline ABHA health records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
